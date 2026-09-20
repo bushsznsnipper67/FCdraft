@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FCdraft — Football Draft</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><span class="ball">⚽</span><span>FCdraft</span></div>
+  <nav>
+    <button data-page="home" class="nav active">Home</button>
+    <button data-page="draft" class="nav">Draft</button>
+    <button data-page="market" class="nav">Market</button>
+    <button data-page="club" class="nav">My Club</button>
+    <button data-page="matches" class="nav">Matches</button>
+  </nav>
+  <div class="coins">🪙 <b id="coins">1,000</b></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">BUILD. DRAFT. PLAY.</p>
+      <h1>Your club.<br><span>Your choices.</span></h1>
+      <p class="lead">Create your ultimate squad by drafting three players at a time, then take your team into a match.</p>
+      <button class="primary" onclick="showPage('draft')">Start Draft →</button>
+    </div>
+    <div class="hero-card">
+      <div class="mini-card">
+        <div class="rating">91</div><div class="pos">ST</div>
+        <div class="silhouette">⚽</div><strong>ELITE PICK</strong>
+      </div>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div><b id="homePlayers">0</b><span>Players owned</span></div>
+    <div><b id="homeDrafts">0</b><span>Drafts completed</span></div>
+    <div><b id="homeWins">0</b><span>Wins</span></div>
+    <div><b id="homeRating">0</b><span>Club rating</span></div>
+  </div>
+</section>
+
+<section id="draft" class="page">
+  <div class="section-head"><div><p class="eyebrow">DRAFT</p><h2>Build your squad</h2></div><div id="draftStatus"></div></div>
+  <div id="formationPicker" class="panel">
+    <h3>Choose a formation</h3>
+    <p>Pick a formation, then fill every position on the pitch.</p>
+    <div id="formations" class="formation-grid"></div>
+  </div>
+  <div id="draftArea" class="draft-layout hidden">
+    <div class="pitch-wrap">
+      <div class="pitch" id="pitch"></div>
+    </div>
+    <aside class="choices panel">
+      <div class="choice-head"><span id="choicePosition">Select a position</span><button onclick="resetDraft()" class="small">Reset</button></div>
+      <div id="choiceList"><div class="empty">Click a position on the pitch to see 3 players.</div></div>
+    </aside>
+  </div>
+</section>
+
+<section id="market" class="page">
+  <div class="section-head"><div><p class="eyebrow">TRANSFER MARKET</p><h2>Spend coins. Build depth.</h2></div></div>
+  <div class="panel economy-note">Game economy — FCdraft uses in-game coins only. Coins are earned by playing matches and can be spent in the player market.</div>
+  <div id="marketGrid" class="player-grid"></div>
+</section>
+
+<section id="club" class="page">
+  <div class="section-head"><div><p class="eyebrow">MY CLUB</p><h2>Your players</h2></div></div>
+  <div id="clubGrid" class="player-grid"></div>
+</section>
+
+<section id="matches" class="page">
+  <div class="section-head"><div><p class="eyebrow">MATCH CENTRE</p><h2>Play a match</h2></div></div>
+  <div class="match-panel panel">
+    <div class="difficulty">
+      <button class="diff active" data-diff="Beginner">Beginner<br><small>+50 coins</small></button>
+      <button class="diff" data-diff="Amateur">Amateur<br><small>+75 coins</small></button>
+      <button class="diff" data-diff="Semi-Pro">Semi-Pro<br><small>+100 coins</small></button>
+      <button class="diff" data-diff="Professional">Professional<br><small>+150 coins</small></button>
+      <button class="diff" data-diff="World Class">World Class<br><small>+225 coins</small></button>
+      <button class="diff" data-diff="Legendary">Legendary<br><small>+350 coins</small></button>
+    </div>
+    <button class="primary wide" onclick="playMatch()">Play Match</button>
+    <div id="matchResult"></div>
+  </div>
+  <div class="panel history"><h3>Recent matches</h3><div id="historyList"></div></div>
+</section>
+</main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
