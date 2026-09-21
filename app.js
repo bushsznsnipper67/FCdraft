@@ -2,28 +2,28 @@
 // FCdraft RANDOM PLAYER SPAWN SYSTEM
 // ============================================================
 
-// Players selected during the CURRENT draft.
-// This resets whenever a new draft starts.
+// Players that have already appeared ANYWHERE in this draft.
+// A player in this Set can NEVER appear again until a new draft.
 let currentDraftPlayers = new Set();
 
-// Players selected for the CURRENT position choice.
+// Players currently displayed in the 3-choice screen.
 let currentChoicePlayers = new Set();
 
 
-// ------------------------------------------------------------
-// RANDOM WEIGHT
-// ------------------------------------------------------------
-// Higher-rated players are rarer.
-// Lower-rated players have a higher chance to appear.
-//
-// This is NOT a fixed rating tier system.
-// Every player gets a random chance.
-// ------------------------------------------------------------
+// ============================================================
+// RANDOM SPAWN WEIGHT
+// ============================================================
+// Every player has a chance to spawn.
+// Higher rated = rarer
+// Lower rated = more common
+// ============================================================
 
 function playerSpawnWeight(player) {
 
   const rating = getPlayerOvr(player);
 
+  if (rating >= 95) return 0.25;
+  if (rating >= 92) return 0.5;
   if (rating >= 90) return 1;
   if (rating >= 88) return 2;
   if (rating >= 85) return 4;
@@ -37,27 +37,31 @@ function playerSpawnWeight(player) {
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // WEIGHTED RANDOM PLAYER
-// ------------------------------------------------------------
+// ============================================================
 
 function weightedRandomPlayer(pool) {
 
-  if (!pool.length) return null;
+  if (!pool || pool.length === 0) {
+    return null;
+  }
 
   let totalWeight = 0;
 
-  pool.forEach(player => {
+  for (const player of pool) {
     totalWeight += playerSpawnWeight(player);
-  });
+  }
 
-  let random =
-    Math.random() * totalWeight;
+  if (totalWeight <= 0) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  let random = Math.random() * totalWeight;
 
   for (const player of pool) {
 
-    random -=
-      playerSpawnWeight(player);
+    random -= playerSpawnWeight(player);
 
     if (random <= 0) {
       return player;
@@ -68,99 +72,171 @@ function weightedRandomPlayer(pool) {
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // GET 3 UNIQUE PLAYER CHOICES
-// ------------------------------------------------------------
+// ============================================================
 
 function candidates(position) {
 
-  const allowed =
-    compatiblePositions(position);
+  const allowed = compatiblePositions(position);
 
-  // Only players who can play this position
-  let pool =
-    players.filter(player =>
-      allowed.includes(player.pos)
-    );
+  // ----------------------------------------------------------
+  // STEP 1:
+  // Get players who can play this position.
+  // ----------------------------------------------------------
 
-  // Remove players already selected
-  // during this draft.
-  pool =
-    pool.filter(player =>
-      !currentDraftPlayers.has(player.id)
-    );
+  let pool = players.filter(player => {
 
-  // Remove players already used in
-  // this particular choice.
-  pool =
-    pool.filter(player =>
+    return (
+      allowed.includes(player.pos) &&
+      !currentDraftPlayers.has(player.id) &&
       !currentChoicePlayers.has(player.id)
     );
 
+  });
+
+
   const choices = [];
 
-  // Keep selecting until we have 3
-  // DIFFERENT players.
+
+  // ----------------------------------------------------------
+  // STEP 2:
+  // Pick 3 DIFFERENT players.
+  // ----------------------------------------------------------
+
   while (
     choices.length < 3 &&
     pool.length > 0
   ) {
 
-    const player =
-      weightedRandomPlayer(pool);
+    const player = weightedRandomPlayer(pool);
 
-    if (!player) break;
+    if (!player) {
+      break;
+    }
 
+    // Add player to this choice.
     choices.push(player);
 
-    // Remove immediately so the same
-    // player cannot be selected twice.
-    pool =
-      pool.filter(
-        p => p.id !== player.id
-      );
+    // VERY IMPORTANT:
+    // Add them to the current choice immediately.
+    currentChoicePlayers.add(player.id);
+
+    // Remove them from the pool.
+    // This makes duplicates impossible.
+    pool = pool.filter(
+      p => p.id !== player.id
+    );
   }
 
-  // If there aren't enough exact-position
-  // players, safely fill remaining spaces
-  // with unused players.
+
+  // ----------------------------------------------------------
+  // STEP 3:
+  // If there aren't 3 players at that position,
+  // use other unused players as backup.
+  // ----------------------------------------------------------
+
   if (choices.length < 3) {
 
-    let backup =
-      players.filter(player =>
+    let backup = players.filter(player => {
+
+      return (
         !currentDraftPlayers.has(player.id) &&
+        !currentChoicePlayers.has(player.id) &&
         !choices.some(
           p => p.id === player.id
         )
       );
 
+    });
+
+
     while (
       choices.length < 3 &&
-      backup.length
+      backup.length > 0
     ) {
 
       const player =
         weightedRandomPlayer(backup);
 
-      if (!player) break;
+      if (!player) {
+        break;
+      }
 
       choices.push(player);
 
-      backup =
-        backup.filter(
-          p => p.id !== player.id
-        );
+      currentChoicePlayers.add(player.id);
+
+      backup = backup.filter(
+        p => p.id !== player.id
+      );
     }
   }
 
-  // Final safety check:
-  // absolutely no duplicate player IDs.
-  return [
+
+  // ----------------------------------------------------------
+  // FINAL DUPLICATE SAFETY CHECK
+  // ----------------------------------------------------------
+
+  const uniqueChoices = [
     ...new Map(
       choices.map(player => [
         player.id,
         player
       ])
     ).values()
-  ].slice(0, 3);
+  ];
+
+
+  return uniqueChoices.slice(0, 3);
+}
+
+
+// ============================================================
+// START A NEW DRAFT
+// ============================================================
+// CALL THIS WHEN THE USER STARTS A NEW DRAFT.
+// ============================================================
+
+function resetDraftPlayerPool() {
+
+  currentDraftPlayers.clear();
+  currentChoicePlayers.clear();
+
+}
+
+
+// ============================================================
+// SHOWING A NEW POSITION
+// ============================================================
+// Call this BEFORE generating the next 3 players.
+// ============================================================
+
+function startPlayerChoice() {
+
+  // Clear only the previous 3-player screen.
+  currentChoicePlayers.clear();
+
+}
+
+
+// ============================================================
+// PLAYER WAS SELECTED
+// ============================================================
+// IMPORTANT:
+// Call this when the user actually picks a player.
+// ============================================================
+
+function markPlayerSelected(player) {
+
+  if (!player || player.id == null) {
+    return;
+  }
+
+  // This player is now permanently unavailable
+  // for the rest of this draft.
+  currentDraftPlayers.add(player.id);
+
+  // Remove from current choice.
+  currentChoicePlayers.delete(player.id);
 }
