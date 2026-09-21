@@ -1,96 +1,538 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FCdraft — Football Draft</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>FCdraft</title>
+  <meta
+    name="description"
+    content="FCdraft - Build your ultimate football squad through random player drafts."
+  >
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<div class="app">
-<header class="topbar">
-  <div class="brand"><span class="ball">⚽</span><span>FCdraft</span></div>
-  <nav>
-    <button data-page="home" class="nav active">Home</button>
-    <button data-page="draft" class="nav">Draft</button>
-    <button data-page="market" class="nav">Market</button>
-    <button data-page="club" class="nav">My Club</button>
-    <button data-page="matches" class="nav">Matches</button>
-  </nav>
-  <div class="coins">🪙 <b id="coins">1,000</b></div>
-</header>
 
-<main>
-<section id="home" class="page active">
-  <div class="hero">
-    <div>
-      <p class="eyebrow">BUILD. DRAFT. PLAY.</p>
-      <h1>Your club.<br><span>Your choices.</span></h1>
-      <p class="lead">Create your ultimate squad by drafting three players at a time, then take your team into a match.</p>
-      <button class="primary" onclick="showPage('draft')">Start Draft →</button>
+  <!-- =====================================================
+       TOP NAVIGATION
+  ====================================================== -->
+
+  <header class="topbar">
+
+    <div class="logo" onclick="showPage('home')">
+      ⚽ FC<span>draft</span>
     </div>
-    <div class="hero-card">
-      <div class="mini-card">
-        <div class="rating">91</div><div class="pos">ST</div>
-        <div class="silhouette">⚽</div><strong>ELITE PICK</strong>
+
+    <nav class="nav">
+
+      <button
+        class="nav-btn active"
+        onclick="showPage('home')"
+      >
+        Home
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showPage('draft')"
+      >
+        Draft
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showPage('market')"
+      >
+        Market
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showPage('club')"
+      >
+        My Club
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showPage('matches')"
+      >
+        Matches
+      </button>
+
+    </nav>
+
+    <div class="coin-display">
+      🪙 <span id="coinCount">0</span>
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN CONTENT
+  ====================================================== -->
+
+  <main>
+
+
+    <!-- =================================================
+         HOME
+    ================================================== -->
+
+    <section
+      id="homePage"
+      class="page active-page"
+    >
+
+      <div class="hero">
+
+        <div class="hero-content">
+
+          <p class="eyebrow">
+            BUILD YOUR DREAM SQUAD
+          </p>
+
+          <h1>
+            Welcome to<br>
+            <span>FCdraft</span>
+          </h1>
+
+          <p class="hero-text">
+            Choose your formation, face random player choices,
+            build your squad and create your ultimate football team.
+          </p>
+
+          <div class="hero-buttons">
+
+            <button
+              class="primary-btn"
+              onclick="showPage('draft')"
+            >
+              Start Draft
+            </button>
+
+            <button
+              class="secondary-btn"
+              onclick="showPage('club')"
+            >
+              My Club
+            </button>
+
+          </div>
+
+        </div>
+
       </div>
+
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">🎲</div>
+          <h3>Random Drafts</h3>
+          <p>
+            Every draft gives you new random player choices.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⭐</div>
+          <h3>Rare Players</h3>
+          <p>
+            Higher-rated players have a lower spawn chance.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Earn Coins</h3>
+          <p>
+            Play matches and use your coins in the Market.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">👑</div>
+          <h3>Prime Players</h3>
+          <p>
+            Upgrade your players with the Prime system.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         DRAFT
+    ================================================== -->
+
+    <section
+      id="draftPage"
+      class="page"
+    >
+
+      <div class="page-header">
+
+        <div>
+          <p class="eyebrow">
+            BUILD YOUR SQUAD
+          </p>
+
+          <h2>Draft</h2>
+
+          <p>
+            Choose a formation and fill every position.
+          </p>
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="startNewDraft()"
+        >
+          New Draft
+        </button>
+
+      </div>
+
+
+      <!-- FORMATION SELECTOR -->
+
+      <div class="formation-section">
+
+        <label for="formationSelect">
+          Formation
+        </label>
+
+        <select
+          id="formationSelect"
+          onchange="selectFormation(this.value)"
+        >
+          <option value="4-3-3">4-3-3</option>
+          <option value="4-4-2">4-4-2</option>
+          <option value="4-2-3-1">4-2-3-1</option>
+          <option value="4-3-2-1">4-3-2-1</option>
+          <option value="4-1-2-1-2">4-1-2-1-2</option>
+          <option value="3-4-3">3-4-3</option>
+          <option value="3-5-2">3-5-2</option>
+          <option value="5-3-2">5-3-2</option>
+          <option value="5-2-3">5-2-3</option>
+        </select>
+
+      </div>
+
+
+      <!-- DRAFT AREA -->
+
+      <div class="draft-layout">
+
+        <!-- FOOTBALL PITCH -->
+
+        <div class="pitch-container">
+
+          <div
+            id="pitch"
+            class="pitch"
+          >
+
+            <div class="pitch-line center-line"></div>
+
+            <div class="center-circle"></div>
+
+            <div class="penalty-box top-box"></div>
+
+            <div class="penalty-box bottom-box"></div>
+
+            <div
+              id="formationPositions"
+              class="formation-positions"
+            >
+              <!-- JavaScript creates positions here -->
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PLAYER CHOICES -->
+
+        <div class="choices-panel">
+
+          <div class="choices-header">
+
+            <h3>
+              Choose a Player
+            </h3>
+
+            <p id="choiceInstruction">
+              Select a position on the pitch.
+            </p>
+
+          </div>
+
+
+          <div
+            id="playerChoices"
+            class="player-choices"
+          >
+
+            <div class="empty-choice">
+              <span>⚽</span>
+              <p>
+                Select a position to see your 3 player choices.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         MARKET
+    ================================================== -->
+
+    <section
+      id="marketPage"
+      class="page"
+    >
+
+      <div class="page-header">
+
+        <div>
+
+          <p class="eyebrow">
+            TRANSFER MARKET
+          </p>
+
+          <h2>Market</h2>
+
+          <p>
+            Spend your in-game coins to add players to your club.
+          </p>
+
+        </div>
+
+        <div class="large-coin-display">
+          🪙 <span id="marketCoins">0</span>
+        </div>
+
+      </div>
+
+
+      <div
+        id="marketPlayers"
+        class="player-grid"
+      >
+        <!-- JavaScript creates market players -->
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         MY CLUB
+    ================================================== -->
+
+    <section
+      id="clubPage"
+      class="page"
+    >
+
+      <div class="page-header">
+
+        <div>
+
+          <p class="eyebrow">
+            YOUR COLLECTION
+          </p>
+
+          <h2>My Club</h2>
+
+          <p>
+            View and manage the players you own.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="clubPlayers"
+        class="player-grid"
+      >
+        <!-- JavaScript creates owned players -->
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         MATCHES
+    ================================================== -->
+
+    <section
+      id="matchesPage"
+      class="page"
+    >
+
+      <div class="page-header">
+
+        <div>
+
+          <p class="eyebrow">
+            PLAY MATCHES
+          </p>
+
+          <h2>Matches</h2>
+
+          <p>
+            Choose a difficulty and earn coins.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="difficulty-grid">
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('Beginner')"
+        >
+          <span>⚽</span>
+          <strong>Beginner</strong>
+          <small>+50 coins</small>
+        </button>
+
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('Amateur')"
+        >
+          <span>⚽</span>
+          <strong>Amateur</strong>
+          <small>+75 coins</small>
+        </button>
+
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('Semi-Pro')"
+        >
+          <span>⚽</span>
+          <strong>Semi-Pro</strong>
+          <small>+100 coins</small>
+        </button>
+
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('Professional')"
+        >
+          <span>🔥</span>
+          <strong>Professional</strong>
+          <small>+150 coins</small>
+        </button>
+
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('World Class')"
+        >
+          <span>⭐</span>
+          <strong>World Class</strong>
+          <small>+225 coins</small>
+        </button>
+
+
+        <button
+          class="difficulty-card"
+          onclick="playMatch('Legendary')"
+        >
+          <span>👑</span>
+          <strong>Legendary</strong>
+          <small>+350 coins</small>
+        </button>
+
+      </div>
+
+
+      <div class="match-history-section">
+
+        <h3>
+          Match History
+        </h3>
+
+        <div
+          id="matchHistory"
+          class="match-history"
+        >
+          <!-- JavaScript creates history -->
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       PLAYER MODAL
+  ====================================================== -->
+
+  <div
+    id="playerModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-content">
+
+      <button
+        class="modal-close"
+        onclick="closePlayerModal()"
+      >
+        ×
+      </button>
+
+      <div id="modalPlayerContent">
+        <!-- JavaScript inserts player information -->
+      </div>
+
     </div>
-  </div>
-  <div class="stats-grid">
-    <div><b id="homePlayers">0</b><span>Players owned</span></div>
-    <div><b id="homeDrafts">0</b><span>Drafts completed</span></div>
-    <div><b id="homeWins">0</b><span>Wins</span></div>
-    <div><b id="homeRating">0</b><span>Club rating</span></div>
-  </div>
-</section>
 
-<section id="draft" class="page">
-  <div class="section-head"><div><p class="eyebrow">DRAFT</p><h2>Build your squad</h2></div><div id="draftStatus"></div></div>
-  <div id="formationPicker" class="panel">
-    <h3>Choose a formation</h3>
-    <p>Pick a formation, then fill every position on the pitch.</p>
-    <div id="formations" class="formation-grid"></div>
   </div>
-  <div id="draftArea" class="draft-layout hidden">
-    <div class="pitch-wrap">
-      <div class="pitch" id="pitch"></div>
-    </div>
-    <aside class="choices panel">
-      <div class="choice-head"><span id="choicePosition">Select a position</span><button onclick="resetDraft()" class="small">Reset</button></div>
-      <div id="choiceList"><div class="empty">Click a position on the pitch to see 3 players.</div></div>
-    </aside>
+
+
+  <!-- =====================================================
+       NOTIFICATION
+  ====================================================== -->
+
+  <div
+    id="notification"
+    class="notification"
+  >
+    <span id="notificationText"></span>
   </div>
-</section>
 
-<section id="market" class="page">
-  <div class="section-head"><div><p class="eyebrow">TRANSFER MARKET</p><h2>Spend coins. Build depth.</h2></div></div>
-  <div class="panel economy-note">Game economy — FCdraft uses in-game coins only. Coins are earned by playing matches and can be spent in the player market.</div>
-  <div id="marketGrid" class="player-grid"></div>
-</section>
 
-<section id="club" class="page">
-  <div class="section-head"><div><p class="eyebrow">MY CLUB</p><h2>Your players</h2></div></div>
-  <div id="clubGrid" class="player-grid"></div>
-</section>
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
 
-<section id="matches" class="page">
-  <div class="section-head"><div><p class="eyebrow">MATCH CENTRE</p><h2>Play a match</h2></div></div>
-  <div class="match-panel panel">
-    <div class="difficulty">
-      <button class="diff active" data-diff="Beginner">Beginner<br><small>+50 coins</small></button>
-      <button class="diff" data-diff="Amateur">Amateur<br><small>+75 coins</small></button>
-      <button class="diff" data-diff="Semi-Pro">Semi-Pro<br><small>+100 coins</small></button>
-      <button class="diff" data-diff="Professional">Professional<br><small>+150 coins</small></button>
-      <button class="diff" data-diff="World Class">World Class<br><small>+225 coins</small></button>
-      <button class="diff" data-diff="Legendary">Legendary<br><small>+350 coins</small></button>
-    </div>
-    <button class="primary wide" onclick="playMatch()">Play Match</button>
-    <div id="matchResult"></div>
-  </div>
-  <div class="panel history"><h3>Recent matches</h3><div id="historyList"></div></div>
-</section>
-</main>
-</div>
-<script src="app.js"></script>
+  <script src="app.js"></script>
+
 </body>
 </html>
